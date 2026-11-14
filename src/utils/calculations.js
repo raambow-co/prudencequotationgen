@@ -1,5 +1,5 @@
 /**
- * Solar techno-commercial calculation utilities for JAYARAMS SOLAR SOLUTIONS
+ * Solar techno-commercial calculation utilities for PRUDENCE SOLAR & SCIENTIFIC SOLUTIONS
  * Conforms to MNRE, PM Surya Ghar DBT guidelines, and IS 875 structural standards.
  */
 

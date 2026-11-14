@@ -369,7 +369,7 @@ export default function SettingsView({ currentSettings, onSaveSettings, onResetD
                     onChange={(e) => updateSettings('company.shortName', e.target.value)}
                     className="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20"
                   />
-                  <span className="text-[10px] text-slate-400">e.g. JAYARAMS</span>
+                  <span className="text-[10px] text-slate-400">e.g. PRUDENCE</span>
                 </div>
 
                 <div className="sm:col-span-2">
@@ -559,7 +559,7 @@ export default function SettingsView({ currentSettings, onSaveSettings, onResetD
                     <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">Handle / Subtitle</label>
                     <input
                       type="text"
-                      value={settings.qrPortals?.facebook?.handle || '@jayaramssolar'}
+                      value={settings.qrPortals?.facebook?.handle || '@prudencesolar'}
                       onChange={(e) => updateSettings('qrPortals.facebook.handle', e.target.value)}
                       className="w-full px-2.5 py-1.5 rounded border border-slate-300 bg-white"
                     />
@@ -607,7 +607,7 @@ export default function SettingsView({ currentSettings, onSaveSettings, onResetD
                     <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">Handle / Subtitle</label>
                     <input
                       type="text"
-                      value={settings.qrPortals?.instagram?.handle || '@jayaramssolar'}
+                      value={settings.qrPortals?.instagram?.handle || '@prudencesolar'}
                       onChange={(e) => updateSettings('qrPortals.instagram.handle', e.target.value)}
                       className="w-full px-2.5 py-1.5 rounded border border-slate-300 bg-white"
                     />
@@ -655,7 +655,7 @@ export default function SettingsView({ currentSettings, onSaveSettings, onResetD
                     <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">Domain / Subtitle</label>
                     <input
                       type="text"
-                      value={settings.qrPortals?.website?.handle || 'jayaramsenergy.com'}
+                      value={settings.qrPortals?.website?.handle || 'prudencesolar.com'}
                       onChange={(e) => updateSettings('qrPortals.website.handle', e.target.value)}
                       className="w-full px-2.5 py-1.5 rounded border border-slate-300 bg-white"
                     />
@@ -1549,7 +1549,7 @@ export default function SettingsView({ currentSettings, onSaveSettings, onResetD
                   <label className="block font-semibold text-slate-700 mb-1">Stamp Top Circular Text</label>
                   <input
                     type="text"
-                    value={settings.authorization?.stampTop || '★ JAYARAMS SOLAR SOLUTIONS ★'}
+                    value={settings.authorization?.stampTop || '★ PRUDENCE SOLAR & SCIENTIFIC SOLUTIONS ★'}
                     onChange={(e) => updateSettings('authorization.stampTop', e.target.value)}
                     className="w-full px-3 py-2 font-mono text-xs rounded-lg border border-slate-300"
                   />

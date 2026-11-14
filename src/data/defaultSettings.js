@@ -1,61 +1,61 @@
 export const defaultSettings = {
   company: {
-    name: "JAYARAMS SOLAR SOLUTIONS",
-    legalName: "Jayarams Solar Solutions Pvt. Ltd.",
-    shortName: "JAYARAMS",
-    tagline: "Built on Trust. Driven by Excellence.",
+    name: "PRUDENCE SOLAR & SCIENTIFIC SOLUTIONS",
+    legalName: "Prudence Solar & Scientific Solutions Pvt. Ltd.",
+    shortName: "PRUDENCE",
+    tagline: "Inspired by Science. Powered by Sun.",
     subheading: "State DISCOM Empanelled Solar EPC Vendor • Registered PM Surya Ghar Channel Partner",
-    about: "JAYARAMS SOLAR SOLUTIONS PVT. LTD. is a premier clean energy EPC company specializing in high-performance rooftop solar installations across residential, commercial, institutional, and industrial facilities. Backed by certified civil and electrical engineers, we combine Tier-1 BloombergNEF hardware with precision structural design, seamless DISCOM net-metering facilitation, and lifetime IoT monitoring.",
-    address: "Plot #48, Road No. 36, Jubilee Hills, Hyderabad, Telangana - 500033",
-    branches: "Hyderabad | Visakhapatnam | Bangalore | Vijayawada",
-    phone: "+91 98480 12345 / +91 89127 65432",
-    email: "solar@jayaramsenergy.com",
-    website: "www.jayaramsenergy.com",
-    gstin: "36AABCJ9821K1ZX",
-    cin: "U40106TG2020PTC144589",
-    pan: "AABCJ9821K",
-    mnreEmpanelment: "TS-DISCOM-8492",
-    msme: "UDYAM-TS-02-0048192"
+    about: "PRUDENCE SOLAR & SCIENTIFIC SOLUTIONS PVT. LTD. is an advanced clean-tech engineering and EPC enterprise dedicated to high-yield solar energy infrastructure across residential, commercial, institutional, and industrial facilities. Grounded in rigorous scientific principles and certified electrical engineering, we combine Tier-1 BloombergNEF modules, high-efficiency smart telemetry, and seamless DISCOM net-metering synchronization.",
+    address: "Prudence Towers, Clean Energy Corridor, Financial District, Hyderabad, Telangana - 500032",
+    branches: "Hyderabad | Visakhapatnam | Bangalore | Vijayawada | Chennai",
+    phone: "+91 94400 56789 / +91 89129 87654",
+    email: "solar@prudencesolar.com",
+    website: "www.prudencesolar.com",
+    gstin: "36AAPCP4819K1ZM",
+    cin: "U40106TG2021PTC155890",
+    pan: "AAPCP4819K",
+    mnreEmpanelment: "PRU-DISCOM-9241",
+    msme: "UDYAM-TS-02-0059281"
   },
   
   qrPortals: {
     facebook: {
       title: "Facebook",
-      handle: "@jayaramssolar",
-      badge: "Social",
+      handle: "@prudencesolar",
+      badge: "Community",
       actionText: "Scan to Follow",
-      url: "https://facebook.com/jayaramssolar",
+      url: "https://facebook.com/prudencesolar",
       image: "/assets/qr/fb-qr.jpeg"
     },
     instagram: {
       title: "Instagram",
-      handle: "@jayaramssolar",
-      badge: "Reels",
+      handle: "@prudencesolar",
+      badge: "Live Projects",
       actionText: "Scan to View",
-      url: "https://instagram.com/jayaramssolar",
+      url: "https://instagram.com/prudencesolar",
       image: "/assets/qr/insta-qr.jpeg"
     },
     website: {
-      title: "Official Website",
-      handle: "jayaramsenergy.com",
-      badge: "Portal",
+      title: "Official Portal",
+      handle: "prudencesolar.com",
+      badge: "Web Portal",
       actionText: "Scan to Visit",
-      url: "https://www.jayaramsenergy.com",
+      url: "https://www.prudencesolar.com",
       image: "/assets/qr/web-qr.jpeg"
     },
     googleMaps: {
       title: "Google Maps",
-      handle: "Jubilee Hills HQ",
-      badge: "Location",
+      handle: "Prudence Tech HQ",
+      badge: "HQ Navigation",
       actionText: "Scan for Route",
-      url: "https://maps.google.com/?q=Jayarams+Solar+Hyderabad",
+      url: "https://maps.google.com/?q=Prudence+Solar+Solutions",
       image: "/assets/qr/loc-qr.jpeg"
     }
   },
 
   coverPage: {
     heroTitle: "Techno-Commercial Solar Proposal",
-    heroSubtitle: "Tailored high-efficiency solar photovoltaic power generation system engineered for maximum energy yield, structural durability, and substantial utility bill savings.",
+    heroSubtitle: "Engineered with scientific precision for maximum energy harvest, structural resilience, and long-term utility bill savings.",
     badge1: "Grid-Interactive Solar PV System",
     badge2: "DISCOM Empanelled EPC",
     features: [
@@ -127,7 +127,7 @@ export const defaultSettings = {
     panelProduct: "12-Year Comprehensive Manufacturer Product Workmanship Defect Warranty",
     inverterWarranty: "10-Year Standard Manufacturer Repair / Replacement Warranty",
     structureWarranty: "10-Year Structural Integrity & Corrosion Warranty (80µm Hot-Dip Galvanized Iron)",
-    workmanshipAmc: "5-Year Comprehensive Free AMC & Preventive Maintenance by Jayarams Solar Solutions Pvt. Ltd."
+    workmanshipAmc: "5-Year Comprehensive Free AMC & Preventive Maintenance by Prudence Solar & Scientific Solutions Pvt. Ltd."
   },
 
   paymentMilestones: [
@@ -137,20 +137,20 @@ export const defaultSettings = {
   ],
 
   authorization: {
-    signatoryName: "Er. R. Jayaram Reddy",
-    signatoryTitle: "Technical Director & Head of EPC",
-    division: "Technical EPC Engineering & Commercial Sales Division",
-    approvedBadge: "Approved & Signed",
-    stampTop: "★ JAYARAMS SOLAR SOLUTIONS ★",
+    signatoryName: "Er. K. Prudence Kumar",
+    signatoryTitle: "Technical Director & Head of Solar EPC",
+    division: "Technical Engineering & Commercial Projects Division",
+    approvedBadge: "Approved & Verified",
+    stampTop: "★ PRUDENCE SOLAR & SCIENTIFIC SOLUTIONS ★",
     stampCenter: "AUTHORIZED",
     stampBottom: "TECHNICAL EPC DIVISION"
   },
 
   executionRoadmap: [
     { step: 1, title: "3D CAD Survey", description: "Shadow trajectory & roof load analysis." },
-    { step: 2, title: "Engineering", description: "SLD design & structural calculations." },
-    { step: 3, title: "DISCOM Approvals", description: "Net-metering feasibility liaison." },
-    { step: 4, title: "Installation", description: "Elevated GI MMS & TOPCon rigging." },
+    { step: 2, title: "Scientific Sizing", description: "SLD design & structural calculations." },
+    { step: 3, title: "DISCOM Liaison", description: "Net-metering feasibility liaison." },
+    { step: 4, title: "Precision Rigging", description: "Elevated GI MMS & TOPCon installation." },
     { step: 5, title: "Commissioning", description: "3-pit earthing test & grid sync." },
     { step: 6, title: "Telemetry & AMC", description: "24/7 Cloud app monitoring." }
   ],
@@ -165,7 +165,7 @@ export const defaultSettings = {
   ],
 
   omAssurance: {
-    tagline: "Pan-South India Service Network",
+    tagline: "Pan-South India Service & Technical Support Network",
     features: [
       { title: "Biannual Health Check", description: "I-V curve tracer tests & thermography" },
       { title: "24/7 Telemetry Desk", description: "Automated inverter fault alert system" },
@@ -176,13 +176,13 @@ export const defaultSettings = {
 
   portfolioWorks: {
     metrics: {
-      plantsCount: "850+",
+      plantsCount: "920+",
       plantsLabel: "Rooftop Plants",
       plantsSubtitle: "Across South India",
-      capacity: "12.8+ MW",
+      capacity: "14.5+ MW",
       capacityLabel: "Total Capacity",
       capacitySubtitle: "Grid Synchronized",
-      savings: "₹4.8+ Cr",
+      savings: "₹5.4+ Cr",
       savingsLabel: "Annual Savings",
       savingsSubtitle: "For Esteemed Clients",
       netMetering: "100%",

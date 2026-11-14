@@ -25,3 +25,6 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Local media
+WhatsApp Image*.jpeg
+

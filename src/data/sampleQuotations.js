@@ -1,7 +1,7 @@
 export const sampleQuotations = [
   {
     id: "quote-1",
-    quotationNumber: "JAY-SOL-2026-1048",
+    quotationNumber: "PRU-SOL-2026-1048",
     date: "2026-11-05",
     validityDays: 30,
     status: "Approved",
@@ -58,7 +58,7 @@ export const sampleQuotations = [
       panelPerformance: "25-Year Linear Performance Warranty (Min 98% in Yr 1, ≤0.55%/yr linear degradation, ≥84.8% at Yr 25)",
       panelProduct: "12-Year Comprehensive Manufacturer Workmanship Defect Warranty",
       inverterWarranty: "10-Year Standard Manufacturer Repair / Replacement Warranty",
-      workmanshipAmc: "5-Year Free Comprehensive Maintenance & Quarterly Health Inspections by Jayarams"
+      workmanshipAmc: "5-Year Free Comprehensive Maintenance & Quarterly Health Inspections by Prudence"
     },
     paymentMilestones: [
       { milestone: "Booking & Engineering Advance", percentage: 20, description: "Upon acceptance & structural CAD design sign-off" },
@@ -66,11 +66,11 @@ export const sampleQuotations = [
       { milestone: "Commissioning & Net Metering", percentage: 10, description: "Upon physical completion & submission to TSSPDCL" }
     ],
     notes: "Proposal includes complete turnkey Discom net-metering facilitation, RCC foundation column pedestals, and one complimentary high-pressure solar panel cleaning kit.",
-    preparedBy: "Jayarams Solar Engineering & Sales Team"
+    preparedBy: "Prudence Solar Engineering & Sales Team"
   },
   {
     id: "quote-2",
-    quotationNumber: "JAY-SOL-2026-1052",
+    quotationNumber: "PRU-SOL-2026-1052",
     date: "2026-11-06",
     validityDays: 21,
     status: "Sent",
@@ -127,7 +127,7 @@ export const sampleQuotations = [
       panelPerformance: "25-Year Linear Performance Warranty (Min 98% in Yr 1, ≤0.55%/yr linear degradation, ≥84.8% at Yr 25)",
       panelProduct: "12-Year Comprehensive Manufacturer Workmanship Defect Warranty",
       inverterWarranty: "10-Year Standard Manufacturer Repair / Replacement Warranty",
-      workmanshipAmc: "5-Year Free Comprehensive Maintenance & Quarterly Health Inspections by Jayarams"
+      workmanshipAmc: "5-Year Free Comprehensive Maintenance & Quarterly Health Inspections by Prudence"
     },
     paymentMilestones: [
       { milestone: "Booking & Engineering Advance", percentage: 20, description: "Upon acceptance & structural CAD design sign-off" },
@@ -135,11 +135,11 @@ export const sampleQuotations = [
       { milestone: "Commissioning & Net Metering", percentage: 10, description: "Upon physical completion & submission to APEPDCL" }
     ],
     notes: "Special commercial rooftop bracket fixtures installed to withstand coastal wind gusts up to 160 km/h.",
-    preparedBy: "Jayarams Solar Engineering & Sales Team"
+    preparedBy: "Prudence Solar Engineering & Sales Team"
   },
   {
     id: "quote-3",
-    quotationNumber: "JAY-SOL-2026-1035",
+    quotationNumber: "PRU-SOL-2026-1035",
     date: "2026-11-03",
     validityDays: 15,
     status: "Draft",
@@ -196,7 +196,7 @@ export const sampleQuotations = [
       panelPerformance: "25-Year Linear Performance Warranty (Min 98% in Yr 1, ≤0.55%/yr linear degradation, ≥84.8% at Yr 25)",
       panelProduct: "12-Year Comprehensive Manufacturer Workmanship Defect Warranty",
       inverterWarranty: "10-Year Standard Manufacturer Repair / Replacement Warranty",
-      workmanshipAmc: "5-Year Free Comprehensive Maintenance & Quarterly Health Inspections by Jayarams"
+      workmanshipAmc: "5-Year Free Comprehensive Maintenance & Quarterly Health Inspections by Prudence"
     },
     paymentMilestones: [
       { milestone: "Booking & Engineering Advance", percentage: 20, description: "Upon acceptance & structural CAD design sign-off" },
@@ -204,6 +204,6 @@ export const sampleQuotations = [
       { milestone: "Commissioning & Net Metering", percentage: 10, description: "Upon physical completion & submission to Discom" }
     ],
     notes: "Includes industrial grade zero-export relay device option, APCPDCL statutory liaison, and complete factory electrical audit.",
-    preparedBy: "Jayarams Solar Engineering & Sales Team"
+    preparedBy: "Prudence Solar Engineering & Sales Team"
   }
 ];

@@ -48,7 +48,7 @@
   <g transform="translate(150, 40)">
     <rect x="0" y="0" width="300" height="305" rx="16" fill="url(#chassisGrad)" stroke="#94a3b8" stroke-width="1.5"/>
 
-    <!-- Top Accent Band (Sungrow/Jayarams Solar Navy Blue Accent) -->
+    <!-- Top Accent Band (Sungrow/Prudence Solar Navy Blue Accent) -->
     <path d="M0,16 Q0,0 16,0 L284,0 Q300,0 300,16 L300,45 L0,45 Z" fill="#0b2545"/>
     <text x="24" y="28" fill="#f8fafc" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="900" letter-spacing="1">SUNGROW POWER</text>
     <text x="24" y="40" fill="#38bdf8" font-family="system-ui, -apple-system, sans-serif" font-size="8.5" font-weight="700">SG5.0RS • SMART DUAL MPPT</text>
