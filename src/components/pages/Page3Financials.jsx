@@ -27,8 +27,14 @@ import Watermark from '../common/Watermark';
 import { EMBLEMS } from '../../utils/brandLogos';
 
 export default function Page3Financials({ quotation, settings }) {
-  const company = settings?.company || {};
-  const auth = settings?.authorization || {};
+  const company = quotation?.company 
+    || settings?.companyDetails?.find(d => d.id === quotation?.companyDetailId) 
+    || settings?.company 
+    || {};
+  const auth = quotation?.authorization 
+    || company?.authorization 
+    || settings?.authorization 
+    || {};
   const commercials = quotation?.commercials || {};
   const technical = quotation?.technical || {};
   const customer = quotation?.customer || {};

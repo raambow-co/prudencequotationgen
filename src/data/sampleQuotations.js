@@ -1,3 +1,5 @@
+import { defaultCompanyDetails } from './defaultSettings';
+
 export const sampleQuotations = [
   {
     id: "quote-1",
@@ -5,6 +7,8 @@ export const sampleQuotations = [
     date: "2026-11-05",
     validityDays: 30,
     status: "Approved",
+    companyDetailId: "detail-1",
+    company: defaultCompanyDetails[0],
     customer: {
       name: "Srikanth Reddy",
       companyName: "Reddy Residencies",
@@ -74,6 +78,8 @@ export const sampleQuotations = [
     date: "2026-11-06",
     validityDays: 21,
     status: "Sent",
+    companyDetailId: "detail-2",
+    company: defaultCompanyDetails[1],
     customer: {
       name: "Dr. Ananya Rao",
       companyName: "Rao Orthopedic Centre",

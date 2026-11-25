@@ -15,11 +15,18 @@ import {
   FileCheck, 
   ShieldCheck, 
   RotateCcw,
-  CheckCircle2
+  CheckCircle2,
+  Building
 } from 'lucide-react';
+import { defaultCompanyDetails } from '../data/defaultSettings';
 
 export default function QuotationForm({ initialData, settings, onSave, onCancel, onPreview }) {
   const [activeTab, setActiveTab] = useState('customer'); // 'customer', 'technical', 'commercials', 'terms'
+
+  const availableCompanyDetails = (Array.isArray(settings?.companyDetails) && settings.companyDetails.length > 0)
+    ? settings.companyDetails
+    : defaultCompanyDetails;
+  const defaultDetail = availableCompanyDetails.find(d => d.id === settings?.defaultCompanyDetailId) || availableCompanyDetails[0];
 
   // Initialize Form Data
   const [formData, setFormData] = useState(() => {
@@ -42,6 +49,9 @@ export default function QuotationForm({ initialData, settings, onSave, onCancel,
       date: new Date().toISOString().split('T')[0],
       validityDays: 30,
       status: 'Draft',
+      companyDetailId: initialData?.companyDetailId || defaultDetail?.id || 'detail-1',
+      company: initialData?.company || defaultDetail,
+      authorization: initialData?.authorization || defaultDetail?.authorization || settings?.authorization,
       customer: {
         name: '',
         companyName: '',
@@ -145,14 +155,19 @@ export default function QuotationForm({ initialData, settings, onSave, onCancel,
   });
 
   // Recompute automatically when capacity, panel wattage, rate, discount, or subsidy changes
-  const handleCapacityChange = (kwValue, newWattage = null) => {
-    const kw = parseFloat(kwValue) || 0;
+  // PRESERVES EXACT TYPED OR CLICKED CAPACITY IN systemCapacityKw (does NOT forcibly overwrite with actualDcCapacityKw)
+  const handleCapacityChange = (kwInput, newWattage = null) => {
+    const rawKw = kwInput;
+    const numKw = parseFloat(kwInput);
+    const isValidNum = !isNaN(numKw) && numKw > 0;
     const wattage = newWattage !== null ? newWattage : (formData.technical.panelWattage || 550);
-    const metrics = calculateSolarMetrics(kw, 8.5, wattage);
-    const subsidy = calculateSubsidy(metrics.actualDcCapacityKw, formData.commercials.subsidyScheme);
+    
+    const validKw = isValidNum ? numKw : 0;
+    const metrics = calculateSolarMetrics(validKw, 8.5, wattage);
+    const subsidy = calculateSubsidy(validKw, formData.commercials.subsidyScheme);
     
     const fin = calculateFinancials({
-      capacityKw: metrics.actualDcCapacityKw,
+      capacityKw: validKw,
       pricePerKw: formData.commercials.ratePerKw,
       gstRate: formData.commercials.gstRate,
       discountAmount: formData.commercials.discount,
@@ -164,17 +179,17 @@ export default function QuotationForm({ initialData, settings, onSave, onCancel,
       ...prev,
       technical: {
         ...prev.technical,
-        systemCapacityKw: metrics.actualDcCapacityKw,
-        actualDcCapacityKw: metrics.actualDcCapacityKw,
-        acInverterCapacityKw: kw,
+        systemCapacityKw: rawKw,
+        actualDcCapacityKw: isValidNum ? metrics.actualDcCapacityKw : 0,
+        acInverterCapacityKw: validKw,
         panelWattage: wattage,
-        panelCount: metrics.panelCount,
-        estimatedDailyUnits: metrics.dailyUnits,
-        estimatedAnnualUnits: metrics.annualUnits,
-        estimatedMonthlySavings: metrics.monthlySavings,
-        estimatedAnnualSavings: metrics.annualSavings,
-        roofAreaSqFt: metrics.roofAreaSqFt,
-        co2SavedTonnes: metrics.annualCo2SavedTonnes
+        panelCount: isValidNum ? metrics.panelCount : 0,
+        estimatedDailyUnits: isValidNum ? metrics.dailyUnits : 0,
+        estimatedAnnualUnits: isValidNum ? metrics.annualUnits : 0,
+        estimatedMonthlySavings: isValidNum ? metrics.monthlySavings : 0,
+        estimatedAnnualSavings: isValidNum ? metrics.annualSavings : 0,
+        roofAreaSqFt: isValidNum ? metrics.roofAreaSqFt : 0,
+        co2SavedTonnes: isValidNum ? metrics.annualCo2SavedTonnes : 0
       },
       commercials: {
         ...prev.commercials,
@@ -377,6 +392,77 @@ export default function QuotationForm({ initialData, settings, onSave, onCancel,
                     <Sparkles className="w-3.5 h-3.5 text-solar-orange" />
                     <span>Auto-Fill Demo Client</span>
                   </button>
+                </div>
+
+                {/* Company Profile / Detail Selection */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-50 via-sky-50/30 to-slate-50 border border-slate-200/90 shadow-2xs space-y-2.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <span className="text-xs font-bold text-brand-900 uppercase tracking-wide flex items-center gap-1.5">
+                        <Building className="w-3.5 h-3.5 text-brand-700" />
+                        Select Issuing Company Entity / Profile
+                      </span>
+                      <p className="text-[11px] text-slate-500">
+                        Choose which company name and credentials will be printed on all 5 proposal pages.
+                      </p>
+                    </div>
+                    <span className="text-[10px] font-mono text-slate-400 font-bold bg-white px-2 py-0.5 rounded-md border border-slate-200">
+                      Active: {formData.company?.name || 'PRUDENCE'}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 pt-1">
+                    {availableCompanyDetails.map((detail) => {
+                      const isSelected = (formData.companyDetailId === detail.id) || 
+                        (!formData.companyDetailId && detail.id === settings?.defaultCompanyDetailId) ||
+                        (formData.company?.name === detail.name);
+
+                      return (
+                        <button
+                          key={detail.id}
+                          type="button"
+                          onClick={() => {
+                            setFormData(prev => ({
+                              ...prev,
+                              companyDetailId: detail.id,
+                              company: { ...detail },
+                              authorization: { ...(detail.authorization || prev.authorization) }
+                            }));
+                          }}
+                          className={`p-3 rounded-xl border-2 text-left transition-all relative ${
+                            isSelected
+                              ? 'bg-brand-900 text-white border-brand-900 shadow-sm ring-2 ring-brand-500/30'
+                              : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200 shadow-2xs'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                              isSelected ? 'bg-white/20 text-sky-200' : 'bg-brand-50 text-brand-900 border border-sky-200'
+                            }`}>
+                              {detail.label || 'Detail'}
+                            </span>
+                            {isSelected && (
+                              <span className="flex items-center gap-1 text-[10px] font-bold text-eco-300">
+                                <CheckCircle2 className="w-3.5 h-3.5" /> Selected
+                              </span>
+                            )}
+                          </div>
+                          <p className={`text-xs font-black truncate ${isSelected ? 'text-white' : 'text-brand-900'}`}>
+                            {detail.name}
+                          </p>
+                          <p className={`text-[10.5px] truncate mt-0.5 ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>
+                            {detail.legalName}
+                          </p>
+                          <div className={`mt-2 pt-1.5 border-t text-[10px] flex items-center justify-between ${
+                            isSelected ? 'border-white/10 text-slate-300' : 'border-slate-100 text-slate-400'
+                          }`}>
+                            <span className="font-mono">GST: {detail.gstin || 'N/A'}</span>
+                            <span className="truncate max-w-[120px]">{detail.branches?.split('|')[0] || 'Hyderabad'}</span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -645,7 +731,7 @@ export default function QuotationForm({ initialData, settings, onSave, onCancel,
                         type="button"
                         onClick={() => handleCapacityChange(kw)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                          formData.technical.systemCapacityKw === kw
+                          parseFloat(formData.technical.systemCapacityKw) === kw
                             ? 'bg-brand-900 text-white shadow-xs'
                             : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                         }`}
@@ -664,16 +750,25 @@ export default function QuotationForm({ initialData, settings, onSave, onCancel,
                     <div className="relative">
                       <input
                         type="number"
-                        step="0.5"
-                        min="1"
-                        max="500"
+                        step="any"
+                        min="0.1"
+                        max="10000"
                         required
-                        value={formData.technical.systemCapacityKw}
+                        value={formData.technical.systemCapacityKw ?? ''}
                         onChange={(e) => handleCapacityChange(e.target.value)}
+                        onBlur={() => {
+                          const num = parseFloat(formData.technical.systemCapacityKw);
+                          if (isNaN(num) || num <= 0) {
+                            handleCapacityChange(3);
+                          }
+                        }}
                         className="w-full px-3 py-2 text-xs font-bold text-slate-900 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
                       />
                       <span className="absolute right-3 top-2 text-xs text-slate-400 font-semibold">kWp</span>
                     </div>
+                    <span className="text-[10px] text-slate-400 mt-1 block">
+                      Directly editable target kWp (e.g. 3, 5, 120.45)
+                    </span>
                   </div>
 
                   <div>
@@ -721,9 +816,14 @@ export default function QuotationForm({ initialData, settings, onSave, onCancel,
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
                       Exact DC Sizing &amp; Modules
                     </label>
-                    <div className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800">
-                      {formData.technical.panelCount} Modules &bull; {formData.technical.actualDcCapacityKw || formData.technical.systemCapacityKw} kWp DC
+                    <div className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 flex items-center justify-between">
+                      <span>{formData.technical.panelCount || 0} Modules</span>
+                      <span className="text-slate-400">&bull;</span>
+                      <span className="text-brand-900 font-black">{formData.technical.actualDcCapacityKw || 0} kWp DC</span>
                     </div>
+                    <span className="text-[10px] text-slate-400 mt-1 block">
+                      {formData.technical.panelCount || 0} × {formData.technical.panelWattage || 550}Wp = {formData.technical.actualDcCapacityKw || 0} kWp DC
+                    </span>
                   </div>
                 </div>
 
@@ -1264,6 +1364,13 @@ export default function QuotationForm({ initialData, settings, onSave, onCancel,
               </span>
             </div>
 
+            {/* Issuing Entity Badge */}
+            <div className="mt-3 p-2.5 rounded-xl bg-brand-50/50 border border-sky-200/80 text-xs">
+              <span className="text-[9px] uppercase font-bold text-slate-500 block">Issuing Entity ({formData.company?.label || 'Selected'})</span>
+              <span className="font-extrabold text-brand-900 block truncate">{formData.company?.name || 'PRUDENCE'}</span>
+              <span className="text-[10px] text-slate-600 block truncate">{formData.company?.legalName}</span>
+            </div>
+
             {/* Capacity Highlight Card */}
             <div className="mt-3.5 p-3.5 rounded-2xl bg-gradient-to-br from-brand-950 via-brand-900 to-sky-950 text-white text-center shadow-xs relative overflow-hidden">
               <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-sky-500/10 rounded-full blur-xl pointer-events-none" />
@@ -1272,7 +1379,7 @@ export default function QuotationForm({ initialData, settings, onSave, onCancel,
                 {formData.technical.systemCapacityKw} <span className="text-sm font-bold text-sky-200">kWp</span>
               </p>
               <p className="text-[11px] text-slate-300 mt-1 font-medium">
-                {formData.technical.panelCount} Solar Modules &bull; {formData.technical.panelBrand}
+                {formData.technical.panelCount} Solar Modules &bull; {formData.technical.actualDcCapacityKw || formData.technical.systemCapacityKw} kWp DC
               </p>
             </div>
 

@@ -36,7 +36,10 @@ import { EMBLEMS } from '../../utils/brandLogos';
 import Watermark from '../common/Watermark';
 
 export default function Page1Cover({ quotation, settings }) {
-  const company = settings?.company || {};
+  const company = quotation?.company 
+    || settings?.companyDetails?.find(d => d.id === quotation?.companyDetailId) 
+    || settings?.company 
+    || {};
   const customer = quotation?.customer || {};
   const technical = quotation?.technical || {};
   const commercials = quotation?.commercials || {};

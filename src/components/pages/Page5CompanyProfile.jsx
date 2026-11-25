@@ -31,7 +31,10 @@ import Watermark from '../common/Watermark';
 import { EMBLEMS } from '../../utils/brandLogos';
 
 export default function Page5CompanyProfile({ quotation, settings }) {
-  const company = settings?.company || {};
+  const company = quotation?.company 
+    || settings?.companyDetails?.find(d => d.id === quotation?.companyDetailId) 
+    || settings?.company 
+    || {};
   const qr = settings?.qrPortals || {};
   const roadmap = settings?.executionRoadmap || [
     { step: 1, title: "3D CAD Survey", description: "Shadow trajectory & roof load analysis." },

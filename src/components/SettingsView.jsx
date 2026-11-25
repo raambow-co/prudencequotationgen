@@ -21,17 +21,27 @@ import {
   Check,
   ExternalLink,
   Info,
-  Zap
+  Zap,
+  Star,
+  Copy
 } from 'lucide-react';
-import { defaultSettings } from '../data/defaultSettings';
+import { defaultSettings, defaultCompanyDetails } from '../data/defaultSettings';
 
 export default function SettingsView({ currentSettings, onSaveSettings, onResetDefaults, onBack }) {
   const [settings, setSettings] = useState(() => {
     const base = currentSettings || defaultSettings;
+    const companyDetails = (Array.isArray(base.companyDetails) && base.companyDetails.length > 0)
+      ? base.companyDetails
+      : defaultCompanyDetails;
+    const defaultCompanyDetailId = base.defaultCompanyDetailId || defaultSettings.defaultCompanyDetailId || 'detail-1';
+    const activeCompany = companyDetails.find(d => d.id === defaultCompanyDetailId) || companyDetails[0];
+
     return JSON.parse(JSON.stringify({
       ...defaultSettings,
       ...base,
-      company: { ...defaultSettings.company, ...(base.company || {}) },
+      companyDetails,
+      defaultCompanyDetailId,
+      company: activeCompany,
       qrPortals: { ...defaultSettings.qrPortals, ...(base.qrPortals || {}) },
       coverPage: { ...defaultSettings.coverPage, ...(base.coverPage || {}) },
       pricing: { ...defaultSettings.pricing, ...(base.pricing || {}) },
@@ -89,9 +99,131 @@ export default function SettingsView({ currentSettings, onSaveSettings, onResetD
     if (window.confirm("Are you sure you want to reset all admin panel settings to factory defaults? Any custom modifications will be replaced.")) {
       onResetDefaults();
       setSettings(JSON.parse(JSON.stringify(defaultSettings)));
+      setSelectedDetailId('detail-1');
       setSavedNotification(true);
       setTimeout(() => setSavedNotification(false), 3500);
     }
+  };
+
+  const [selectedDetailId, setSelectedDetailId] = useState(() => {
+    const base = currentSettings || defaultSettings;
+    return base.defaultCompanyDetailId || base.companyDetails?.[0]?.id || 'detail-1';
+  });
+
+  const companyDetails = (Array.isArray(settings.companyDetails) && settings.companyDetails.length > 0)
+    ? settings.companyDetails
+    : defaultCompanyDetails;
+
+  const currentDetail = companyDetails.find(d => d.id === selectedDetailId) || companyDetails[0];
+
+  const updateCurrentDetail = (field, value) => {
+    setSettings(prev => {
+      const list = (prev.companyDetails || defaultCompanyDetails).map(d => {
+        if (d.id !== selectedDetailId) return d;
+        if (field.startsWith('authorization.')) {
+          const authKey = field.split('.')[1];
+          return {
+            ...d,
+            authorization: { ...(d.authorization || {}), [authKey]: value }
+          };
+        }
+        return { ...d, [field]: value };
+      });
+
+      const isDefault = (prev.defaultCompanyDetailId || 'detail-1') === selectedDetailId;
+      const updatedCurrent = list.find(d => d.id === selectedDetailId) || list[0];
+
+      return {
+        ...prev,
+        companyDetails: list,
+        ...(isDefault ? {
+          company: updatedCurrent,
+          authorization: { ...(prev.authorization || {}), ...(updatedCurrent.authorization || {}) }
+        } : {})
+      };
+    });
+  };
+
+  const handleAddDetail = () => {
+    const list = settings.companyDetails || defaultCompanyDetails;
+    const nextNum = list.length + 1;
+    const newId = `detail-${Date.now()}`;
+    const newDetail = {
+      id: newId,
+      label: `Detail ${nextNum}`,
+      name: `PRUDENCE ENERGY DIVISION ${nextNum}`,
+      legalName: `Prudence Energy Division ${nextNum} Pvt. Ltd.`,
+      shortName: `PRUDENCE ${nextNum}`,
+      tagline: "Inspired by Science. Powered by Sun.",
+      subheading: "State DISCOM Empanelled Solar EPC Vendor",
+      about: "PRUDENCE SOLAR & SCIENTIFIC SOLUTIONS is an advanced clean-tech engineering and EPC enterprise dedicated to high-yield solar energy infrastructure across residential, commercial, institutional, and industrial facilities.",
+      address: "Prudence Towers, Clean Energy Corridor, Financial District, Hyderabad, Telangana - 500032",
+      branches: "Hyderabad | Visakhapatnam | Bangalore | Chennai",
+      phone: "+91 94400 56789 / +91 89129 87654",
+      email: "solar@prudencesolar.com",
+      website: "www.prudencesolar.com",
+      gstin: "36AAPCP4819K1ZM",
+      cin: "U40106TG2021PTC155890",
+      pan: "AAPCP4819K",
+      mnreEmpanelment: "PRU-DISCOM-9241",
+      msme: "UDYAM-TS-02-0059281",
+      authorization: {
+        signatoryName: "Er. K. Prudence Kumar",
+        signatoryTitle: "Technical Director & Head of Solar EPC",
+        division: "Technical Engineering & Commercial Projects Division",
+        approvedBadge: "Approved & Verified",
+        stampTop: `★ PRUDENCE ENERGY DIVISION ${nextNum} ★`,
+        stampCenter: "AUTHORIZED",
+        stampBottom: "TECHNICAL EPC DIVISION"
+      }
+    };
+
+    setSettings(prev => ({
+      ...prev,
+      companyDetails: [...(prev.companyDetails || defaultCompanyDetails), newDetail]
+    }));
+    setSelectedDetailId(newId);
+  };
+
+  const handleDeleteDetail = (idToDelete) => {
+    const list = settings.companyDetails || defaultCompanyDetails;
+    if (list.length <= 1) {
+      alert("At least one company detail profile must remain.");
+      return;
+    }
+    const itemToDelete = list.find(d => d.id === idToDelete);
+    if (!window.confirm(`Are you sure you want to delete "${itemToDelete?.label || itemToDelete?.name}"?`)) {
+      return;
+    }
+
+    const filtered = list.filter(d => d.id !== idToDelete);
+    const newDefaultId = settings.defaultCompanyDetailId === idToDelete ? filtered[0].id : settings.defaultCompanyDetailId;
+    const newDefaultCompany = filtered.find(d => d.id === newDefaultId) || filtered[0];
+
+    setSettings(prev => ({
+      ...prev,
+      companyDetails: filtered,
+      defaultCompanyDetailId: newDefaultId,
+      company: newDefaultCompany,
+      authorization: { ...(prev.authorization || {}), ...(newDefaultCompany.authorization || {}) }
+    }));
+
+    if (selectedDetailId === idToDelete) {
+      setSelectedDetailId(filtered[0].id);
+    }
+  };
+
+  const handleSetDefaultDetail = (id) => {
+    const list = settings.companyDetails || defaultCompanyDetails;
+    const target = list.find(d => d.id === id);
+    if (!target) return;
+
+    setSettings(prev => ({
+      ...prev,
+      defaultCompanyDetailId: id,
+      company: target,
+      authorization: { ...(prev.authorization || {}), ...(target.authorization || {}) }
+    }));
   };
 
   // Helper updater
@@ -326,47 +458,166 @@ export default function SettingsView({ currentSettings, onSaveSettings, onResetD
       <form onSubmit={handleSave} className="space-y-6">
 
         {/* ============================================================== */}
-        {/* TAB 1: COMPANY & STATUTORY CREDENTIALS */}
+        {/* TAB 1: COMPANY ENTITY DETAILS & MULTI-PROFILE MANAGER */}
         {/* ============================================================== */}
         {activeTab === 'company' && (
           <div className="space-y-6">
+            {/* Top Multi-Company Profile Selection & Management Bar */}
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-              <div className="border-b border-slate-200 pb-3 flex items-center gap-2">
-                <Building className="w-4 h-4 text-brand-700" />
-                <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-                  Corporate Identity &amp; Branding Details
-                </h2>
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                <div className="flex items-center gap-2">
+                  <Building className="w-5 h-5 text-brand-700" />
+                  <div>
+                    <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+                      Company Details &amp; Entity Profiles
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                      Manage multiple company profiles (e.g. Detail 1: PRUDENCE SOLAR &amp; SCIENTIFIC SOLUTIONS, Detail 2: PRUDENCE INDUSTRIES PVT. LTD). When generating a quotation, choose which entity should be used.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleAddDetail}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-brand-900 hover:bg-brand-800 shadow-xs transition-all hover:scale-105 active:scale-95"
+                >
+                  <Plus className="w-4 h-4 text-solar-warm" />
+                  <span>Add New Detail</span>
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Company Trade / Display Name</label>
+              {/* Profiles Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {companyDetails.map((detail, idx) => {
+                  const isSelected = detail.id === selectedDetailId;
+                  const isDefault = (settings.defaultCompanyDetailId || 'detail-1') === detail.id;
+
+                  return (
+                    <div
+                      key={detail.id}
+                      onClick={() => setSelectedDetailId(detail.id)}
+                      className={`p-4 rounded-xl border-2 transition-all cursor-pointer relative flex flex-col justify-between ${
+                        isSelected
+                          ? 'border-brand-900 bg-brand-50/40 shadow-sm ring-1 ring-brand-900/10'
+                          : 'border-slate-200 bg-slate-50/40 hover:bg-slate-100/60 hover:border-slate-300'
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                            isSelected ? 'bg-brand-900 text-white' : 'bg-slate-200 text-slate-700'
+                          }`}>
+                            {detail.label || `Detail ${idx + 1}`}
+                          </span>
+
+                          <div className="flex items-center gap-1.5">
+                            {isDefault ? (
+                              <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full bg-solar-warm/20 text-amber-900 border border-amber-300">
+                                <Star className="w-2.5 h-2.5 fill-solar-warm text-solar-warm" /> Default
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSetDefaultDetail(detail.id);
+                                }}
+                                className="text-[9px] font-bold text-slate-500 hover:text-brand-900 underline px-1 py-0.5"
+                                title="Set as default profile for new quotations"
+                              >
+                                Set Default
+                              </button>
+                            )}
+
+                            {companyDetails.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteDetail(detail.id);
+                                }}
+                                className="p-1 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors ml-1"
+                                title="Delete this profile"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        <h3 className="font-extrabold text-xs text-brand-900 truncate">
+                          {detail.name || 'Unnamed Company'}
+                        </h3>
+                        <p className="text-[11px] text-slate-500 truncate mt-0.5">
+                          {detail.legalName || 'No legal name specified'}
+                        </p>
+                      </div>
+
+                      <div className="mt-3 pt-2 border-t border-slate-200/80 flex items-center justify-between text-[10px] text-slate-400">
+                        <span className="font-mono">GST: {detail.gstin || 'N/A'}</span>
+                        <span className={isSelected ? 'text-brand-900 font-bold' : 'text-slate-400'}>
+                          {isSelected ? '● Editing' : 'Click to edit'}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Editing Section Header */}
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-solar-orange" />
+                  <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
+                    Editing Profile Parameters: <span className="text-brand-900 font-black">{currentDetail?.label || 'Detail'}</span> &bull; {currentDetail?.name}
+                  </h3>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <label className="text-xs font-bold text-slate-700">Detail Profile Name:</label>
                   <input
                     type="text"
-                    value={settings.company?.name || ''}
-                    onChange={(e) => updateSettings('company.name', e.target.value)}
-                    className="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20"
+                    value={currentDetail?.label || ''}
+                    onChange={(e) => updateCurrentDetail('label', e.target.value)}
+                    placeholder="e.g. Detail 1, Prudence Solar..."
+                    className="px-3 py-1.5 text-xs font-bold text-brand-900 rounded-lg border border-brand-300 bg-brand-50/50 focus:ring-2 focus:ring-brand-500/20 focus:outline-none min-w-[180px]"
                   />
-                  <span className="text-[10px] text-slate-400">Printed on quotation titles and covers</span>
+                </div>
+              </div>
+
+              {/* Corporate Identity Inputs for this Detail */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Company Trade / Display Name *</label>
+                  <input
+                    type="text"
+                    value={currentDetail?.name || ''}
+                    onChange={(e) => updateCurrentDetail('name', e.target.value)}
+                    className="w-full px-3 py-2 text-xs font-bold rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20"
+                  />
+                  <span className="text-[10px] text-slate-400">e.g. PRUDENCE SOLAR &amp; SCIENTIFIC SOLUTIONS or PRUDENCE INDUSTRIES PVT. LTD</span>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Company Full Legal Registered Name</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Company Full Legal Registered Name *</label>
                   <input
                     type="text"
-                    value={settings.company?.legalName || ''}
-                    onChange={(e) => updateSettings('company.legalName', e.target.value)}
+                    value={currentDetail?.legalName || ''}
+                    onChange={(e) => updateCurrentDetail('legalName', e.target.value)}
                     className="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20"
                   />
-                  <span className="text-[10px] text-slate-400">Used for official contracts &amp; seals</span>
+                  <span className="text-[10px] text-slate-400">Used for official legal contracts &amp; seals</span>
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Short Brand Name</label>
                   <input
                     type="text"
-                    value={settings.company?.shortName || ''}
-                    onChange={(e) => updateSettings('company.shortName', e.target.value)}
+                    value={currentDetail?.shortName || ''}
+                    onChange={(e) => updateCurrentDetail('shortName', e.target.value)}
                     className="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20"
                   />
                   <span className="text-[10px] text-slate-400">e.g. PRUDENCE</span>
@@ -376,19 +627,19 @@ export default function SettingsView({ currentSettings, onSaveSettings, onResetD
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Corporate Tagline</label>
                   <input
                     type="text"
-                    value={settings.company?.tagline || ''}
-                    onChange={(e) => updateSettings('company.tagline', e.target.value)}
+                    value={currentDetail?.tagline || ''}
+                    onChange={(e) => updateCurrentDetail('tagline', e.target.value)}
                     className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20"
                   />
-                  <span className="text-[10px] text-slate-400">Appears in footers and cover statements</span>
+                  <span className="text-[10px] text-slate-400">Appears in proposal footers and cover statements</span>
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Empanelment Subheading</label>
                   <input
                     type="text"
-                    value={settings.company?.subheading || ''}
-                    onChange={(e) => updateSettings('company.subheading', e.target.value)}
+                    value={currentDetail?.subheading || ''}
+                    onChange={(e) => updateCurrentDetail('subheading', e.target.value)}
                     className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
@@ -397,20 +648,20 @@ export default function SettingsView({ currentSettings, onSaveSettings, onResetD
                   <label className="block text-xs font-semibold text-slate-700 mb-1">About Company Narrative (Page 5)</label>
                   <textarea
                     rows={3}
-                    value={settings.company?.about || ''}
-                    onChange={(e) => updateSettings('company.about', e.target.value)}
+                    value={currentDetail?.about || ''}
+                    onChange={(e) => updateCurrentDetail('about', e.target.value)}
                     className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Registered Address & Regional Contact Strip */}
+            {/* Registered Address & Coordinates for this Detail */}
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
               <div className="border-b border-slate-200 pb-3 flex items-center gap-2">
                 <Building className="w-4 h-4 text-emerald-600" />
                 <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-                  Headquarters, Regional Hubs &amp; Contact Coordinates
+                  Headquarters &amp; Contact Coordinates ({currentDetail?.label})
                 </h2>
               </div>
 
@@ -419,8 +670,8 @@ export default function SettingsView({ currentSettings, onSaveSettings, onResetD
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Headquarters Full Address</label>
                   <input
                     type="text"
-                    value={settings.company?.address || ''}
-                    onChange={(e) => updateSettings('company.address', e.target.value)}
+                    value={currentDetail?.address || ''}
+                    onChange={(e) => updateCurrentDetail('address', e.target.value)}
                     className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
@@ -429,8 +680,8 @@ export default function SettingsView({ currentSettings, onSaveSettings, onResetD
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Regional Branch Network</label>
                   <input
                     type="text"
-                    value={settings.company?.branches || ''}
-                    onChange={(e) => updateSettings('company.branches', e.target.value)}
+                    value={currentDetail?.branches || ''}
+                    onChange={(e) => updateCurrentDetail('branches', e.target.value)}
                     className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
@@ -439,8 +690,8 @@ export default function SettingsView({ currentSettings, onSaveSettings, onResetD
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Support Phone Numbers</label>
                   <input
                     type="text"
-                    value={settings.company?.phone || ''}
-                    onChange={(e) => updateSettings('company.phone', e.target.value)}
+                    value={currentDetail?.phone || ''}
+                    onChange={(e) => updateCurrentDetail('phone', e.target.value)}
                     className="w-full px-3 py-2 text-xs font-medium rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
@@ -449,8 +700,8 @@ export default function SettingsView({ currentSettings, onSaveSettings, onResetD
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Official Email Address</label>
                   <input
                     type="text"
-                    value={settings.company?.email || ''}
-                    onChange={(e) => updateSettings('company.email', e.target.value)}
+                    value={currentDetail?.email || ''}
+                    onChange={(e) => updateCurrentDetail('email', e.target.value)}
                     className="w-full px-3 py-2 text-xs font-medium rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
@@ -459,20 +710,20 @@ export default function SettingsView({ currentSettings, onSaveSettings, onResetD
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Official Website URL</label>
                   <input
                     type="text"
-                    value={settings.company?.website || ''}
-                    onChange={(e) => updateSettings('company.website', e.target.value)}
+                    value={currentDetail?.website || ''}
+                    onChange={(e) => updateCurrentDetail('website', e.target.value)}
                     className="w-full px-3 py-2 text-xs font-medium rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Statutory Registrations Banner */}
+            {/* Statutory Registrations for this Detail */}
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
               <div className="border-b border-slate-200 pb-3 flex items-center gap-2">
                 <Award className="w-4 h-4 text-solar-orange" />
                 <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-                  Statutory Registrations &amp; DISCOM Credentials
+                  Statutory Registrations &amp; DISCOM Credentials ({currentDetail?.label})
                 </h2>
               </div>
 
@@ -481,8 +732,8 @@ export default function SettingsView({ currentSettings, onSaveSettings, onResetD
                   <label className="block text-xs font-semibold text-slate-700 mb-1">GSTIN Number</label>
                   <input
                     type="text"
-                    value={settings.company?.gstin || ''}
-                    onChange={(e) => updateSettings('company.gstin', e.target.value)}
+                    value={currentDetail?.gstin || ''}
+                    onChange={(e) => updateCurrentDetail('gstin', e.target.value)}
                     className="w-full px-3 py-2 text-xs font-mono font-bold rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
@@ -491,18 +742,18 @@ export default function SettingsView({ currentSettings, onSaveSettings, onResetD
                   <label className="block text-xs font-semibold text-slate-700 mb-1">CIN Registration</label>
                   <input
                     type="text"
-                    value={settings.company?.cin || ''}
-                    onChange={(e) => updateSettings('company.cin', e.target.value)}
+                    value={currentDetail?.cin || ''}
+                    onChange={(e) => updateCurrentDetail('cin', e.target.value)}
                     className="w-full px-3 py-2 text-xs font-mono font-bold rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">MNRE Empanelment ID</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">MNRE / DISCOM Empanelment ID</label>
                   <input
                     type="text"
-                    value={settings.company?.mnreEmpanelment || ''}
-                    onChange={(e) => updateSettings('company.mnreEmpanelment', e.target.value)}
+                    value={currentDetail?.mnreEmpanelment || ''}
+                    onChange={(e) => updateCurrentDetail('mnreEmpanelment', e.target.value)}
                     className="w-full px-3 py-2 text-xs font-mono font-bold rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
@@ -511,9 +762,81 @@ export default function SettingsView({ currentSettings, onSaveSettings, onResetD
                   <label className="block text-xs font-semibold text-slate-700 mb-1">MSME Registration Number</label>
                   <input
                     type="text"
-                    value={settings.company?.msme || ''}
-                    onChange={(e) => updateSettings('company.msme', e.target.value)}
+                    value={currentDetail?.msme || ''}
+                    onChange={(e) => updateCurrentDetail('msme', e.target.value)}
                     className="w-full px-3 py-2 text-xs font-mono font-bold rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Authorized Signatory & Rubber Stamp for this Detail */}
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+              <div className="border-b border-slate-200 pb-3 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-brand-700" />
+                <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+                  Signatory &amp; Stamp Authorization ({currentDetail?.label})
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Signatory Full Name</label>
+                  <input
+                    type="text"
+                    value={currentDetail?.authorization?.signatoryName || ''}
+                    onChange={(e) => updateCurrentDetail('authorization.signatoryName', e.target.value)}
+                    className="w-full px-3 py-2 font-bold rounded-lg border border-slate-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Designation / Title</label>
+                  <input
+                    type="text"
+                    value={currentDetail?.authorization?.signatoryTitle || ''}
+                    onChange={(e) => updateCurrentDetail('authorization.signatoryTitle', e.target.value)}
+                    className="w-full px-3 py-2 font-medium rounded-lg border border-slate-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Division / Department</label>
+                  <input
+                    type="text"
+                    value={currentDetail?.authorization?.division || ''}
+                    onChange={(e) => updateCurrentDetail('authorization.division', e.target.value)}
+                    className="w-full px-3 py-2 font-medium rounded-lg border border-slate-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Stamp Top Circular Text</label>
+                  <input
+                    type="text"
+                    value={currentDetail?.authorization?.stampTop || ''}
+                    onChange={(e) => updateCurrentDetail('authorization.stampTop', e.target.value)}
+                    className="w-full px-3 py-2 font-mono text-xs rounded-lg border border-slate-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Stamp Center Text</label>
+                  <input
+                    type="text"
+                    value={currentDetail?.authorization?.stampCenter || ''}
+                    onChange={(e) => updateCurrentDetail('authorization.stampCenter', e.target.value)}
+                    className="w-full px-3 py-2 font-mono text-xs font-bold rounded-lg border border-slate-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Stamp Bottom Circular Text</label>
+                  <input
+                    type="text"
+                    value={currentDetail?.authorization?.stampBottom || ''}
+                    onChange={(e) => updateCurrentDetail('authorization.stampBottom', e.target.value)}
+                    className="w-full px-3 py-2 font-mono text-xs rounded-lg border border-slate-300"
                   />
                 </div>
               </div>

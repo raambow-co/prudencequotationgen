@@ -94,10 +94,18 @@ export default function App() {
       const saved = localStorage.getItem(STORAGE_KEY_SETTINGS);
       if (saved) {
         const parsed = JSON.parse(saved);
+        const companyDetails = (Array.isArray(parsed.companyDetails) && parsed.companyDetails.length > 0)
+          ? parsed.companyDetails
+          : defaultSettings.companyDetails;
+        const defaultCompanyDetailId = parsed.defaultCompanyDetailId || defaultSettings.defaultCompanyDetailId || 'detail-1';
+        const activeCompany = companyDetails.find(d => d.id === defaultCompanyDetailId) || companyDetails[0] || defaultSettings.company;
+
         return {
           ...defaultSettings,
           ...parsed,
-          company: { ...defaultSettings.company, ...(parsed.company || {}) },
+          companyDetails,
+          defaultCompanyDetailId,
+          company: activeCompany,
           qrPortals: { ...defaultSettings.qrPortals, ...(parsed.qrPortals || {}) },
           coverPage: { ...defaultSettings.coverPage, ...(parsed.coverPage || {}) },
           pricing: { ...defaultSettings.pricing, ...(parsed.pricing || {}) },

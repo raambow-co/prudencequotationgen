@@ -430,9 +430,14 @@ export default function Dashboard({
                           <span className="font-mono font-extrabold text-brand-900 block text-[13px] group-hover:text-sky-700 transition-colors">
                             {q.quotationNumber}
                           </span>
-                          <div className="flex items-center gap-1.5 text-[10.5px] text-slate-400 mt-1">
-                            <Calendar className="w-3 h-3 text-slate-400" />
-                            <span>{formatDate(q.date)}</span>
+                          <div className="mt-1 flex flex-col gap-0.5">
+                            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-brand-50 text-brand-900 border border-sky-200 truncate max-w-[180px] inline-block">
+                              {q.company?.name || 'PRUDENCE SOLAR & SCIENTIFIC SOLUTIONS'}
+                            </span>
+                            <div className="flex items-center gap-1.5 text-[10.5px] text-slate-400 mt-0.5">
+                              <Calendar className="w-3 h-3 text-slate-400" />
+                              <span>{formatDate(q.date)}</span>
+                            </div>
                           </div>
                         </td>
 

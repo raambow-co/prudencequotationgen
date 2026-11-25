@@ -28,7 +28,10 @@ import Watermark from '../common/Watermark';
 import { EMBLEMS } from '../../utils/brandLogos';
 
 export default function Page4Portfolio({ quotation, settings }) {
-  const company = settings?.company || {};
+  const company = quotation?.company 
+    || settings?.companyDetails?.find(d => d.id === quotation?.companyDetailId) 
+    || settings?.company 
+    || {};
   const portfolio = settings?.portfolioWorks || {};
   const metrics = portfolio?.metrics || {};
   

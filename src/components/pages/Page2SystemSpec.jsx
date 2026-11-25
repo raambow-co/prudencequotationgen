@@ -33,7 +33,10 @@ import Watermark from '../common/Watermark';
 import { getPanelLogo, getInverterLogo, getCableLogo, EMBLEMS } from '../../utils/brandLogos';
 
 export default function Page2SystemSpec({ quotation, settings }) {
-  const company = settings?.company || {};
+  const company = quotation?.company 
+    || settings?.companyDetails?.find(d => d.id === quotation?.companyDetailId) 
+    || settings?.company 
+    || {};
   const technical = quotation?.technical || {};
   const customer = quotation?.customer || {};
 

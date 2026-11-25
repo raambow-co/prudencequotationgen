@@ -1,5 +1,7 @@
-export const defaultSettings = {
-  company: {
+export const defaultCompanyDetails = [
+  {
+    id: "detail-1",
+    label: "Detail 1",
     name: "PRUDENCE SOLAR & SCIENTIFIC SOLUTIONS",
     legalName: "Prudence Solar & Scientific Solutions Pvt. Ltd.",
     shortName: "PRUDENCE",
@@ -15,8 +17,52 @@ export const defaultSettings = {
     cin: "U40106TG2021PTC155890",
     pan: "AAPCP4819K",
     mnreEmpanelment: "PRU-DISCOM-9241",
-    msme: "UDYAM-TS-02-0059281"
+    msme: "UDYAM-TS-02-0059281",
+    authorization: {
+      signatoryName: "Er. K. Prudence Kumar",
+      signatoryTitle: "Technical Director & Head of Solar EPC",
+      division: "Technical Engineering & Commercial Projects Division",
+      approvedBadge: "Approved & Verified",
+      stampTop: "★ PRUDENCE SOLAR & SCIENTIFIC SOLUTIONS ★",
+      stampCenter: "AUTHORIZED",
+      stampBottom: "TECHNICAL EPC DIVISION"
+    }
   },
+  {
+    id: "detail-2",
+    label: "Detail 2",
+    name: "PRUDENCE INDUSTRIES PVT. LTD",
+    legalName: "Prudence Industries Pvt. Ltd.",
+    shortName: "PRUDENCE INDUSTRIES",
+    tagline: "Heavy-Duty Engineering. Sustainable Power.",
+    subheading: "Turnkey Industrial Solar EPC • High-Capacity Renewable Energy Infrastructure",
+    about: "PRUDENCE INDUSTRIES PVT. LTD. is a premier industrial engineering and turnkey renewable infrastructure EPC enterprise delivering megawatt-scale rooftop and ground-mounted solar power plants with advanced power electronics and certified grid synchronization.",
+    address: "Prudence Industrial Complex, Phase II, IDA Cherlapally, Hyderabad, Telangana - 500051",
+    branches: "Hyderabad | Visakhapatnam | Bangalore | Chennai",
+    phone: "+91 94400 56789 / +91 89129 87654",
+    email: "info@prudenceindustries.com",
+    website: "www.prudenceindustries.com",
+    gstin: "36AAECP1234F1Z8",
+    cin: "U29308TG2020PTC144567",
+    pan: "AAECP1234F",
+    mnreEmpanelment: "PRU-IND-DISCOM-8832",
+    msme: "UDYAM-TS-02-0089123",
+    authorization: {
+      signatoryName: "Er. K. Prudence Kumar",
+      signatoryTitle: "Managing Director & Head of EPC",
+      division: "Industrial Projects & Turnkey EPC Division",
+      approvedBadge: "Approved & Verified",
+      stampTop: "★ PRUDENCE INDUSTRIES PVT. LTD ★",
+      stampCenter: "AUTHORIZED",
+      stampBottom: "INDUSTRIAL EPC DIVISION"
+    }
+  }
+];
+
+export const defaultSettings = {
+  companyDetails: defaultCompanyDetails,
+  defaultCompanyDetailId: "detail-1",
+  company: defaultCompanyDetails[0],
   
   qrPortals: {
     facebook: {
