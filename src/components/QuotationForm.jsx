@@ -207,6 +207,120 @@ export default function QuotationForm({ initialData, settings, onSave, onCancel,
     }));
   };
 
+  // User direct customization of Module Count
+  const handlePanelCountChange = (val) => {
+    const rawVal = val;
+    const count = parseInt(val, 10);
+    const wattage = formData.technical.panelWattage || 550;
+
+    if (!isNaN(count) && count > 0) {
+      const computedDcKw = Number(((count * wattage) / 1000).toFixed(2));
+      const metrics = calculateSolarMetrics(computedDcKw, 8.5, wattage);
+      const subsidy = calculateSubsidy(computedDcKw, formData.commercials.subsidyScheme);
+      const fin = calculateFinancials({
+        capacityKw: computedDcKw,
+        pricePerKw: formData.commercials.ratePerKw,
+        gstRate: formData.commercials.gstRate,
+        discountAmount: formData.commercials.discount,
+        subsidyAmount: subsidy,
+        annualSavings: metrics.annualSavings
+      });
+
+      setFormData(prev => ({
+        ...prev,
+        technical: {
+          ...prev.technical,
+          panelCount: rawVal,
+          actualDcCapacityKw: computedDcKw,
+          estimatedDailyUnits: metrics.dailyUnits,
+          estimatedAnnualUnits: metrics.annualUnits,
+          estimatedMonthlySavings: metrics.monthlySavings,
+          estimatedAnnualSavings: metrics.annualSavings,
+          roofAreaSqFt: metrics.roofAreaSqFt,
+          co2SavedTonnes: metrics.annualCo2SavedTonnes
+        },
+        commercials: {
+          ...prev.commercials,
+          baseCost: fin.basePrice,
+          priceAfterDiscount: fin.priceAfterDiscount,
+          gstAmount: fin.gst,
+          totalGrossCost: fin.totalGrossCost,
+          subsidyAmount: subsidy,
+          netPayable: fin.netPayable,
+          paybackYears: fin.paybackYears,
+          gross25YrSavings: fin.gross25YrSavings,
+          net25YrProfit: fin.net25YrProfit,
+          cumulativeSavings25Years: fin.net25YrProfit
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        technical: {
+          ...prev.technical,
+          panelCount: rawVal
+        }
+      }));
+    }
+  };
+
+  // User direct customization of Exact DC Capacity
+  const handleActualDcCapacityChange = (val) => {
+    const rawVal = val;
+    const dcKw = parseFloat(val);
+    const wattage = formData.technical.panelWattage || 550;
+
+    if (!isNaN(dcKw) && dcKw > 0) {
+      const computedPanels = Math.max(1, Math.round((dcKw * 1000) / wattage));
+      const metrics = calculateSolarMetrics(dcKw, 8.5, wattage);
+      const subsidy = calculateSubsidy(dcKw, formData.commercials.subsidyScheme);
+      const fin = calculateFinancials({
+        capacityKw: dcKw,
+        pricePerKw: formData.commercials.ratePerKw,
+        gstRate: formData.commercials.gstRate,
+        discountAmount: formData.commercials.discount,
+        subsidyAmount: subsidy,
+        annualSavings: metrics.annualSavings
+      });
+
+      setFormData(prev => ({
+        ...prev,
+        technical: {
+          ...prev.technical,
+          actualDcCapacityKw: rawVal,
+          panelCount: computedPanels,
+          estimatedDailyUnits: metrics.dailyUnits,
+          estimatedAnnualUnits: metrics.annualUnits,
+          estimatedMonthlySavings: metrics.monthlySavings,
+          estimatedAnnualSavings: metrics.annualSavings,
+          roofAreaSqFt: metrics.roofAreaSqFt,
+          co2SavedTonnes: metrics.annualCo2SavedTonnes
+        },
+        commercials: {
+          ...prev.commercials,
+          baseCost: fin.basePrice,
+          priceAfterDiscount: fin.priceAfterDiscount,
+          gstAmount: fin.gst,
+          totalGrossCost: fin.totalGrossCost,
+          subsidyAmount: subsidy,
+          netPayable: fin.netPayable,
+          paybackYears: fin.paybackYears,
+          gross25YrSavings: fin.gross25YrSavings,
+          net25YrProfit: fin.net25YrProfit,
+          cumulativeSavings25Years: fin.net25YrProfit
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        technical: {
+          ...prev.technical,
+          actualDcCapacityKw: rawVal
+        }
+      }));
+    }
+  };
+
   const handleCommercialChange = (field, value) => {
     const updatedCommercials = {
       ...formData.commercials,
@@ -813,16 +927,68 @@ export default function QuotationForm({ initialData, settings, onSave, onCancel,
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Exact DC Sizing &amp; Modules
-                    </label>
-                    <div className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 flex items-center justify-between">
-                      <span>{formData.technical.panelCount || 0} Modules</span>
-                      <span className="text-slate-400">&bull;</span>
-                      <span className="text-brand-900 font-black">{formData.technical.actualDcCapacityKw || 0} kWp DC</span>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-semibold text-slate-700">
+                        Exact DC Sizing &amp; Modules
+                      </label>
+                      <span className="text-[9.5px] font-bold text-eco-700 bg-eco-50 px-1.5 py-0.2 rounded border border-eco-200">
+                        Customizable
+                      </span>
                     </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      {/* Module Count Input */}
+                      <div className="relative">
+                        <input
+                          type="number"
+                          min="1"
+                          max="50000"
+                          value={formData.technical.panelCount ?? ''}
+                          onChange={(e) => handlePanelCountChange(e.target.value)}
+                          onBlur={() => {
+                            const count = parseInt(formData.technical.panelCount, 10);
+                            if (isNaN(count) || count <= 0) {
+                              const kw = parseFloat(formData.technical.systemCapacityKw) || 3;
+                              const w = formData.technical.panelWattage || 550;
+                              handlePanelCountChange(Math.max(1, Math.round((kw * 1000) / w)));
+                            }
+                          }}
+                          className="w-full pl-2.5 pr-14 py-2 text-xs font-bold text-slate-900 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 bg-white"
+                          placeholder="Modules"
+                        />
+                        <span className="absolute right-2 top-2 text-[10.5px] text-slate-500 font-semibold pointer-events-none">
+                          Modules
+                        </span>
+                      </div>
+
+                      {/* Exact DC Capacity Input */}
+                      <div className="relative">
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0.1"
+                          max="50000"
+                          value={formData.technical.actualDcCapacityKw ?? ''}
+                          onChange={(e) => handleActualDcCapacityChange(e.target.value)}
+                          onBlur={() => {
+                            const dc = parseFloat(formData.technical.actualDcCapacityKw);
+                            if (isNaN(dc) || dc <= 0) {
+                              const count = parseInt(formData.technical.panelCount, 10) || 6;
+                              const w = formData.technical.panelWattage || 550;
+                              handleActualDcCapacityChange(Number(((count * w) / 1000).toFixed(2)));
+                            }
+                          }}
+                          className="w-full pl-2.5 pr-16 py-2 text-xs font-bold text-brand-900 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 bg-white"
+                          placeholder="kWp DC"
+                        />
+                        <span className="absolute right-2 top-2 text-[10.5px] text-brand-900 font-bold pointer-events-none">
+                          kWp DC
+                        </span>
+                      </div>
+                    </div>
+
                     <span className="text-[10px] text-slate-400 mt-1 block">
-                      {formData.technical.panelCount || 0} × {formData.technical.panelWattage || 550}Wp = {formData.technical.actualDcCapacityKw || 0} kWp DC
+                      {formData.technical.panelCount || 0} × {formData.technical.panelWattage || 550}Wp = {formData.technical.actualDcCapacityKw || 0} kWp DC &bull; Edit modules or kWp directly
                     </span>
                   </div>
                 </div>
